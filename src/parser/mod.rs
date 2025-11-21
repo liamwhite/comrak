@@ -371,9 +371,7 @@ where
     fn parse_block_quote_prefix(&mut self, line: &str) -> bool {
         let bytes = line.as_bytes();
         let indent = self.indent;
-        if indent <= 3
-            && bytes.get(self.first_nonspace) == Some(&b'>')
-            && self.is_not_greentext(line)
+        if indent <= 3 && bytes.get(self.first_nonspace) == Some(&b'>') && !self.is_greentext(line)
         {
             self.advance_offset(line, indent + 1, true);
 
@@ -390,12 +388,15 @@ where
         false
     }
 
-    fn is_not_greentext(&self, line: &str) -> bool {
-        !self.options.extension.greentext
-            || line
-                .as_bytes()
-                .get(self.first_nonspace + 1)
-                .map_or(false, |&b| strings::is_space_or_tab(b))
+    fn is_greentext(&self, line: &str) -> bool {
+        if !self.options.extension.greentext {
+            return false;
+        }
+
+        !line
+            .as_bytes()
+            .get(self.first_nonspace + 1)
+            .map_or(false, |&b| strings::is_space_or_tab(b))
     }
 
     fn parse_node_item_prefix(&mut self, line: &str, container: Node<'a>, nl: &NodeList) -> bool {
@@ -771,7 +772,7 @@ where
     }
 
     fn detect_blockquote(&self, line: &str) -> bool {
-        line.as_bytes().get(self.first_nonspace) == Some(&b'>') && self.is_not_greentext(line)
+        line.as_bytes().get(self.first_nonspace) == Some(&b'>') && !self.is_greentext(line)
     }
 
     fn handle_atx_heading(&mut self, container: &mut Node<'a>, line: &str) -> bool {
