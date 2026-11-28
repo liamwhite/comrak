@@ -58,3 +58,12 @@ fn mismatched_spoilers() {
         ),
     );
 }
+
+#[test]
+fn spoiler_is_not_flanking() {
+    html_opts!(
+        [extension.spoiler],
+        "|| test ||",
+        "<p><span class=\"spoiler\"> test </span></p>\n"
+    );
+}

@@ -2389,7 +2389,10 @@ impl<'a, 'r, 'o, 'd, 'c, 'p> Subject<'a, 'r, 'o, 'd, 'c, 'p> {
                 || after_char.is_whitespace()
                 || after_char.is_cmark_punctuation());
 
-        if b == b'_' {
+        if b == b'|' && numdelims >= 2 && before_char.is_whitespace() && after_char.is_whitespace()
+        {
+            (numdelims, true, true)
+        } else if b == b'_' {
             (
                 numdelims,
                 left_flanking
